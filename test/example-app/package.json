@@ -1,4 +1,5 @@
 {
 	"dependencies": {
+		"hex": "git+ssh://localhost//var/git/hex-flow"
 	}
 }
