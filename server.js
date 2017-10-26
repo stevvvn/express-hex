@@ -1,6 +1,6 @@
 'use strict';
 // @flow
-import type { SMap, Logger } from './types';
+import type { SMap, Logger, Jsonish, Never } from './types';
 
 module.exports = (() => {
 	const
@@ -22,17 +22,30 @@ module.exports = (() => {
 	let conf;
 
 	const log: Logger = require('./lib/log');
-	return {
-		conf,
-		log,
+	const bail = (err: string|Error|{ error: string, ctx: Jsonish }): Never => {
+		let ctx = null;
+		if (err instanceof Error) {
+			ctx = { 'stack': err.stack };
+			err = err.toString();
+		}
+		else if (typeof err === 'object' && err.error && err.ctx) {
+			ctx = err.ctx;
+			err = err.error;
+		}
+		log.error(err.toString(), ctx);
+		process.exit();
+	}
+
+	return { conf, log,
 		'start': (launchPath: string): Promise<string> => {
+			log.info(`booting from ${launchPath}`);
 			conf = require('./lib/conf')(launchPath);
-			log.info('booting', { launchPath });
-			log.warn('...');
-			return new Promise((resolve, reject) => {
-				const port = conf.get('port', 8000);
-				resolve(`:${ port }`);
-			});
+			return require('./lib/middleware')({ log, launchPath, conf }).then((): Promise<string> => {
+				return new Promise((resolve, reject) => {
+					const port = conf.get('port', 8000);
+					resolve(`listening on :${ port }`);
+				});
+			}, bail);
 		}
 	};
 })();
