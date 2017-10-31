@@ -1,6 +1,8 @@
 'use strict';
 // @flow
 
+import * as Express from './express-types';
+
 export type SMap<T> = { [ key: string ]: T }
 
 export type LogMethod = (msg: string, ctx?: Jsonish) => void
@@ -22,8 +24,12 @@ export type JsonObject = SMap<JsonArray|JsonScalar|JsonObject>
 export type Jsonish = JsonScalar|JsonArray|JsonObject
 
 export interface Conf {
-	get: (key?: string, def?: any) => any
+	get: (key?: string, def?: any) => any,
+	set: (key: string, val: any, setter?: ?(targ: any, key: string) => void) => Conf,
+	push: (key: string, val: any) => Conf
 };
+
+export interface App extends Express.Application {}
 
 /**
  * Should really be something like:

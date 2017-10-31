@@ -1,6 +1,7 @@
 'use strict';
 // @flow
 import type { SMap, Logger, Jsonish, Never } from './types';
+const express = require('express'), app = express();
 
 module.exports = (() => {
 	const
@@ -40,10 +41,15 @@ module.exports = (() => {
 		'start': (launchPath: string): Promise<string> => {
 			log.info(`booting from ${launchPath}`);
 			conf = require('./lib/conf')(launchPath);
-			return require('./lib/middleware')({ log, launchPath, conf }).then((): Promise<string> => {
+			return require('./lib/middleware')({ log, launchPath, conf, express, app }).then((): Promise<string> => {
 				return new Promise((resolve, reject) => {
 					const port = conf.get('port', 8000);
-					resolve(`listening on :${ port }`);
+					app.listen(port, (err) => {
+						if (err) {
+							return reject(err);
+						}
+						resolve(`listening on :${ port }`);
+					});
 				});
 			}, bail);
 		}

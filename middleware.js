@@ -3,18 +3,24 @@
 import type { MiddlewareDefs } from './types';
 
 const mw: MiddlewareDefs = {
-	'dep': {
-		'after': [ 'foo' ]
+	'powered-by': {
+		'description': 'Change or remove powered-by header'
 	},
-	'test': {
-		'description': 'just a test',
-		'deps': [ 'dep' ]
+	'access-log': {
+		'description': 'Log requests'
 	},
-	'unused': {
-		'description': 'not required for anything'
+	'negotiate': {
+		'description': 'Parse requested content type out of accept header'
+	},
+	'multirender': {
+		'description': 'Render the same params as HTML, JSON, or YAML',
+		'deps': [ 'templates', 'negotiate' ]
+	},
+	'templates': {
+		'description': 'Template engine for views',
 	},
 	'base': {
-		'bundle': [ 'test' ]
+		'bundle': [ 'powered-by', 'access-log', 'templates', 'negotiate', 'multirender' ]
 	}
 };
 module.exports = mw;
