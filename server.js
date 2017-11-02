@@ -20,9 +20,8 @@ module.exports = (() => {
 		}
 	});
 
-	let conf;
+	let conf, log;
 
-	const log: Logger = require('./lib/log');
 	const bail = (err: string|Error|{ error: string, ctx: Jsonish }): Never => {
 		let ctx = null;
 		if (err instanceof Error) {
@@ -37,13 +36,15 @@ module.exports = (() => {
 		process.exit();
 	}
 
-	return { conf, log,
+	const rv = {
 		'start': (launchPath: string): Promise<string> => {
-			log.info(`booting from ${launchPath}`);
-			conf = require('./lib/conf')(launchPath);
-			return require('./lib/middleware')({ log, launchPath, conf, express, app }).then((): Promise<string> => {
+			rv.conf = require('./lib/conf')(launchPath);
+			rv.log = require('./lib/log')(rv.conf);
+			rv.log.info(`booting from ${launchPath}`);
+
+			return require('./lib/middleware')({ app, express, launchPath, 'log': rv.log, 'conf': rv.conf }).then((): Promise<string> => {
 				return new Promise((resolve, reject) => {
-					const port = process.env.NODE_PORT ? process.env.NODE_PORT : conf.get('http.port', 8000);
+					const port = process.env.NODE_PORT ? process.env.NODE_PORT : rv.conf.get('http.port', 8000);
 					app.listen(port, (err) => {
 						if (err) {
 							return reject(err);
@@ -54,5 +55,6 @@ module.exports = (() => {
 			}, bail);
 		}
 	};
+	return rv;
 })();
 
