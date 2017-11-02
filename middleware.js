@@ -19,8 +19,19 @@ const mw: MiddlewareDefs = {
 	'templates': {
 		'description': 'Template engine for views',
 	},
+	'session': {
+		'description': 'Session management',
+		'deps': [ 'redis' ]
+	},
+	'redis': {
+		'description': 'Promisified Redis client'
+	},
+	'csrf': {
+		'description': 'Request forgery tokens for POST forms',
+		'deps': [ 'session' ]
+	},
 	'base': {
-		'bundle': [ 'powered-by', 'access-log', 'templates', 'negotiate', 'multirender' ]
+		'bundle': [ 'powered-by', 'access-log', 'templates', 'negotiate', 'multirender', 'session' ]
 	}
 };
 module.exports = mw;
