@@ -9,7 +9,7 @@
  * Output is JSON-encoded when the result is non-scalar
  */
 // @flow
-require('flow-remove-types/register');
+require('flow-remove-types/register')({ 'excludes': null });
 let path, keyIdx;
 if (process.argv[2] && process.argv[2].indexOf('/') > -1) {
 	path = process.argv[2];
