@@ -4,7 +4,7 @@ const session = require('express-session');
 module.exports = ({ app, conf }) => {
 	app.use(session({
 		'secret': conf.get('session.secret'),
-		'cookie': { 'maxAge': 60 * 60 * 1000 },
+		'cookie': { 'maxAge': conf.get('session.max-age', 60 * 60 * 1000) },
 		'resave': false,
 		'saveUninitialized': false,
 		'rolling': conf.get('session.rolling', false),
