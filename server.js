@@ -43,7 +43,7 @@ module.exports = (() => {
 			conf = require('./lib/conf')(launchPath);
 			return require('./lib/middleware')({ log, launchPath, conf, express, app }).then((): Promise<string> => {
 				return new Promise((resolve, reject) => {
-					const port = conf.get('port', 8000);
+					const port = process.env.NODE_PORT ? process.env.NODE_PORT : conf.get('http.port', 8000);
 					app.listen(port, (err) => {
 						if (err) {
 							return reject(err);
