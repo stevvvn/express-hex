@@ -3,6 +3,9 @@
 import type { MiddlewareDefs } from './types';
 
 const mw: MiddlewareDefs = {
+	'body-parser': {
+		'description': 'Convert POST bodies to native data'
+	},
 	'powered-by': {
 		'description': 'Change or remove powered-by header'
 	},
@@ -28,10 +31,10 @@ const mw: MiddlewareDefs = {
 	},
 	'csrf': {
 		'description': 'Request forgery tokens for POST forms',
-		'deps': [ 'session' ]
+		'deps': [ 'session', 'body-parser' ]
 	},
 	'base': {
-		'bundle': [ 'powered-by', 'access-log', 'templates', 'negotiate', 'multirender', 'session' ]
+		'bundle': [ 'powered-by', 'access-log', 'templates', 'negotiate', 'multirender', 'session', 'body-parser' ]
 	}
 };
 module.exports = mw;
