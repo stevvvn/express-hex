@@ -3,6 +3,8 @@
 
 const hbs = require('express-hbs');
 
-module.exports = () => {
-	return hbs.express4();
+module.exports = ({ conf }) => {
+	return hbs.express4({
+		'layoutsDir': conf.get('paths.launch') + '/views/layouts'
+	});
 };
