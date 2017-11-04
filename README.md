@@ -84,15 +84,15 @@ module.exports = {
 };
 ```
 
-There is a utility included, `get-conf.js`, which can be run in the same path as these two files to see what this looks to the application:
+There is a utility included, `hex-conf`, which can be run in the same path as these two files to see what this looks to the application:
 ```bash
-$ node node_modules/hex/get-conf.js
+$ node node_modules/.bin/hex-conf
 {"session":{"max-age":3600000,"secret":"kcOt3PDsz6Zesg1jVw8oJ4T0RIc7sAne3JEql7dqLkBVJ"}}
 ```
 
 You can also specify a path to a specific key of interest, using periods to indicate depth:
 ```bash
-$ node node_modules/hex/get-conf.js session.secret
+$ node node_modules/.bin/hex-conf session.secret
 kcOt3PDsz6Zesg1jVw8oJ4T0RIc7sAne3JEql7dqLkBVJ
 ```
 (Note scalar values are not JSON-encoded, so if you want to script external tools on the application's configuration values you don't have to worry about it.)
@@ -101,3 +101,4 @@ Hex middleware is instantiated with `{ conf }`, an object that works similarly. 
 
 ### Logging
 
+### Initializing a new application
