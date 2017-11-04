@@ -1,0 +1,93 @@
+#!/usr/bin/env node
+'use strict';
+// @flow
+
+const
+	{ argv } = require('optimist'),
+	{ spawn } = require('child_process'),
+	fs = require('fs'),
+	path = require('path'),
+	base = path.basename(path.resolve(`${__dirname}/..`)) === 'hex' ? `${__dirname}/..` : `${__dirname}/../hex`,
+	templates = {},
+	inq = require('inquirer');
+	;
+
+fs.readdirSync(`${base}/templates`).forEach((name) => {
+	const idx = `${base}/templates/${name}/index.js`;
+	if (fs.existsSync(idx)) {
+		templates[name] = require(idx);
+		templates[name].base = `${base}/templates/${name}`;
+	}
+});
+
+if (!fs.existsSync('./package.json')) {
+	spawn('npm', [ 'init' ], { 'stdio': 'inherit' }).on('close', () => {
+		if (!fs.existsSync('./package.json')) {
+			console.log('aborted');
+			process.exit();
+		}
+		installTemplate();
+	});
+}
+else {
+	installTemplate();
+}
+
+function installTemplate() {
+	/// @TODO allow templates to specify addtl deps
+	const pkg = JSON.parse(fs.readFileSync('./package.json'));
+	inq.prompt([
+		{
+			'name': 'template',
+			'type': 'list',
+			'choices': Object.keys(templates).map((value) => {
+				return { value, 'name': `${value}: ${templates[value].descr}` };
+			}),
+			'default': 'default',
+			'message': 'Which template?'
+		}
+	]).then((conf) => {
+		const
+			files = templates[conf.template].files,
+			fileNames = Object.keys(files),
+			tplBase = templates[conf.template].base
+			;
+		let fileIdx = 0;
+		const nextFile = () => {
+			if (!fileNames[fileIdx]) {
+				console.log('ok');
+				return;
+			}
+			const file = fileNames[fileIdx];
+			++fileIdx;
+
+			console.log('\t', file, '-', files[file].descr ? files[file].descr : files[file]);
+			if (fs.existsSync(`./${file}`)) {
+				console.log('\t\t[exists, skipping]');
+				return nextFile();
+			}
+			if (/\/$/.test(file)) {
+				fs.mkdirSync(`./${file}`);
+				return nextFile();
+			}
+			const writer = fs.createWriteStream(`./${file}`);
+			const writeNext = () => {
+				writer.close();
+				nextFile();
+			};
+			if (files[file].impl) {
+				writer.write(files[file].impl(pkg, process.cwd()), writeNext);
+				return;
+			}
+			if (fs.existsSync(`${tplBase}/${file}`)) {
+				fs.createReadStream(`${tplBase}/${file}`).pipe(writer);
+				writer.on('unpipe', writeNext);
+				return;
+			}
+			throw new Error(`no source provided for ${file} (${tplBase}/${file})`);
+		};
+		nextFile();
+	});
+}
+
+// vi: ft=javascript
