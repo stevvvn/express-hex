@@ -7,7 +7,11 @@ module.exports = {
 	'files': {
 		'.gitignore': 'Ignore some things you don\'t want to commit',
 		'server.js': 'Application entry point',
+		'middleware/': 'Home for middleware',
+		'middleware/index.js': 'Example middleware',
+		'middleware.js': 'Middleware definitions',
 		'views/': 'Home for templates',
+		'views/index.hbs': 'Example template',
 		'views/layouts/': 'Home for layouts common to templates of the same general type',
 		'views/layouts/html.hbs': 'Layout for HTML views',
 		'conf.js': {
