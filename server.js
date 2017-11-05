@@ -20,8 +20,6 @@ module.exports = (() => {
 		}
 	});
 
-	let conf, log;
-
 	const bail = (err: string|Error|{ error: string, ctx: Jsonish }): Never => {
 		let ctx = null;
 		if (err instanceof Error) {
@@ -32,7 +30,7 @@ module.exports = (() => {
 			ctx = err.ctx;
 			err = err.error;
 		}
-		log.error(err.toString(), ctx);
+		console.log(err.toString(), ctx);
 		process.exit();
 	}
 
