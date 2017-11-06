@@ -1,8 +1,10 @@
 'use strict';
 // @flow
+import type { App, Conf } from '../types';
+
 const	bodyParser = require('body-parser');
 
-module.exports = ({ app, conf }) => {
+module.exports = ({ app, conf }: { app: App, conf: Conf }) => {
 	const bpconf = conf.get('bodyParser', {});
 	if (bpconf.extend === undefined) {
 		bpconf.extended = false;

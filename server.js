@@ -1,6 +1,6 @@
 'use strict';
 // @flow
-import type { SMap, Logger, Jsonish, Never } from './types';
+import type { SMap, Conf, Logger, Jsonish, Never, Bootstrap } from './types';
 const express = require('express'), app = express();
 
 module.exports = (() => {
@@ -32,18 +32,26 @@ module.exports = (() => {
 			ctx = err.ctx;
 			err = err.error;
 		}
-		log.error(err.toString(), ctx);
+		console.error(err.toString(), ctx);
 		process.exit();
 	}
 
-	const rv = {
-		'start': (launchPath: string): Promise<string> => {
+	const rv: Bootstrap = {
+		'init': (launchPath: string): void => {
 			rv.conf = require('./lib/conf')(launchPath);
 			rv.log = require('./lib/log')(rv.conf);
 			rv.log.info(`booting from ${launchPath}`);
-
+		},
+		'start': (launchPath: string): Promise<string> => {
+			rv.init(launchPath);
+			if (!rv.conf || !rv.log) {
+				return bail('intialization failed');
+			}
 			return require('./lib/middleware')({ app, express, launchPath, 'log': rv.log, 'conf': rv.conf }).then((): Promise<string> => {
 				return new Promise((resolve, reject) => {
+					if (!rv.conf || !rv.log) {
+						return reject('intialization failed');
+					}
 					const port = process.env.NODE_PORT ? process.env.NODE_PORT : rv.conf.get('http.port', 8000);
 					app.listen(port, (err) => {
 						if (err) {

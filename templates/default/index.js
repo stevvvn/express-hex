@@ -1,5 +1,7 @@
 'use strict';
 // @flow
+import type { PackageFile } from '../../types';
+
 const SECRET_SIZE = 40;
 
 module.exports = {
@@ -12,11 +14,11 @@ module.exports = {
 		'views/layouts/html.hbs': 'Layout for HTML views',
 		'conf.js': {
 			'descr': 'Commit-able configuration',
-			'impl': (pkg) => {
+			'impl': (pkg: PackageFile): string => {
 				return `'use strict';
 // @flow
 module.exports = {
-	'name': '${pkg.name}'
+	'name': '${pkg.name ? pkg.name.toString() : ''}'
 };`;
 
 			}

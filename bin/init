@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 'use strict';
 // @flow
+import type { PackageFile } from '../types';
 
 const
 	{ argv } = require('optimist'),

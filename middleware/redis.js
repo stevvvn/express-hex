@@ -1,6 +1,6 @@
 'use strict';
 // @flow
-import type { App } from '../types';
+import type { App, Conf, Logger } from '../types';
 
 const
 	redis = require('redis'),
@@ -10,7 +10,7 @@ const
 bluebird.promisifyAll(redis.RedisClient.prototype);
 bluebird.promisifyAll(redis.Multi.prototype);
 
-module.exports = ({ app, conf }) => {
+module.exports = ({ app, conf, log }: { app: App, conf: Conf, log: Logger }): Promise<void> => {
 	const redisConf = Object.assign({
 		'retry': {
 			'max-time': 1000 * 60 * 60,
@@ -36,6 +36,7 @@ module.exports = ({ app, conf }) => {
 	}, redisConf);
 	app.redis = redis.createClient(options);
 	app.redis.exec = app.redis.send_commandAsync;
+
 	return new Promise((resolve, reject) => {
 		let waitingForReady = true;
 		app.redis.on('ready', () => {
