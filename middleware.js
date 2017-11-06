@@ -22,9 +22,12 @@ const mw: MiddlewareDefs = {
 	'templates': {
 		'description': 'Template engine for views',
 	},
+	'pg': {
+		'description': 'PostgreSQL database connection'
+	},
 	'session': {
 		'description': 'Session management',
-		'deps': [ 'redis' ]
+		'after': [ 'redis', 'pg' ]
 	},
 	'redis': {
 		'description': 'Promisified Redis client'
