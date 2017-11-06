@@ -10,7 +10,8 @@ const
 	path = require('path'),
 	base = path.basename(path.resolve(`${__dirname}/..`)) === 'hex' ? `${__dirname}/..` : `${__dirname}/../hex`,
 	templates = {},
-	inq = require('inquirer');
+	inq = require('inquirer'),
+	HEX_SRC = 'https://bitbucket.org/snyder13/hex.git'
 	;
 
 fs.readdirSync(`${base}/templates`).forEach((name) => {
@@ -27,11 +28,15 @@ if (!fs.existsSync('./package.json')) {
 			console.log('aborted');
 			process.exit();
 		}
-		installTemplate();
+		installDeps();
 	});
 }
 else {
-	installTemplate();
+	installDeps();
+}
+
+function installDeps() {
+	spawn('npm', [ 'install', '--save', HEX_SRC ], { 'stdio': 'inherit' }).on('close', installTemplate);
 }
 
 function installTemplate() {

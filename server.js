@@ -20,8 +20,6 @@ module.exports = (() => {
 		}
 	});
 
-	let conf, log;
-
 	const bail = (err: string|Error|{ error: string, ctx: Jsonish }): Never => {
 		let ctx = null;
 		if (err instanceof Error) {
