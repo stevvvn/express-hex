@@ -1,9 +1,10 @@
 'use strict';
 // @flow
+import type { App, Conf } from '../types';
 
 const pg = require('pg').Pool;
 
-module.exports = ({ app, conf }) => {
+module.exports = ({ app, conf }: { app: App, conf: Conf }) => {
 	const pgconf = conf.get('pg');
 	app.pg = new pg(pgconf);
 
