@@ -2,7 +2,7 @@
 const session = require('express-session');
 
 module.exports = ({ app, conf }) => {
-	const mw = conf.get('_middleware');
+	const mw = conf.get('requiredMiddleware');
 	let store = require('./session/' + (mw['hex.redis'] ? 'redis-store' : mw['hex.pg'] ? 'pg-store' : 'mem-store'));
 
 	if (store.attach) {
@@ -11,7 +11,7 @@ module.exports = ({ app, conf }) => {
 	else {
 		store = new store(app);
 	}
-	
+
 	app.use(session({
 		store,
 		'secret': conf.get('session.secret'),
