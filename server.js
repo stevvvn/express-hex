@@ -1,7 +1,7 @@
 'use strict';
 // @flow
 import type { SMap, Conf, Logger, Jsonish, Never, Bootstrap } from './types';
-const express = require('express'), app = express();
+const express = require('express');
 
 module.exports = (() => {
 	const
@@ -39,13 +39,11 @@ module.exports = (() => {
 			rv.conf = require('./lib/conf')(launchPath);
 			rv.log = require('./lib/log')(rv.conf);
 			rv.log.info(`booting from ${launchPath}`);
+			rv.launchPath = launchPath;
+			rv.app = express();
 		},
 		'start': (launchPath: string): Promise<string> => {
-			rv.init(launchPath);
-			if (!rv.conf || !rv.log) {
-				return bail('intialization failed');
-			}
-			return require('./lib/middleware')({ app, express, launchPath, 'log': rv.log, 'conf': rv.conf }).then((): Promise<string> => {
+			return rv.bootstrap(launchPath).then((): Promise<string> => {
 				return new Promise((resolve, reject) => {
 					if (!rv.conf || !rv.log) {
 						return reject('intialization failed');
@@ -59,6 +57,13 @@ module.exports = (() => {
 					});
 				});
 			}, bail);
+		},
+		'bootstrap': (launchPath: string): Promise<string> => {
+			rv.init(launchPath);
+			return require('./lib/middleware')(rv.context());
+		},
+		'context': () => {
+			return { express, 'app': rv.app, 'launchPath': rv.launchPath, 'log': rv.log, 'conf': rv.conf };
 		}
 	};
 	return rv;
