@@ -31,7 +31,6 @@
     "express-hbs": "^1.0.4",
     "express-session": "^1.15.6",
     "flow-remove-types": "^1.2.3",
-    "init": "file:test/init",
     "init-package-json": "^1.10.1",
     "inquirer": "^3.3.0",
     "js-yaml": "^3.10.0",
