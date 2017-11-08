@@ -1,7 +1,6 @@
 #!/usr/bin/env node
 'use strict';
-// @flow
-import type { PackageFile } from '../types';
+require('flow-remove-types/register')({ 'excludes': null });
 
 const
 	{ argv } = require('optimist'),
