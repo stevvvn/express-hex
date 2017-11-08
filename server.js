@@ -1,7 +1,7 @@
 'use strict';
 // @flow
 import type { SMap, Conf, Logger, Jsonish, Never, Bootstrap } from './types';
-const express = require('express');
+const express = require('express'), http = require('http');
 
 module.exports = (() => {
 	const
@@ -50,7 +50,8 @@ module.exports = (() => {
 					}
 					const paths = rv.conf.get('paths'), port = process.env.NODE_PORT ? process.env.NODE_PORT : rv.conf.get('http.port', 8000);
 					rv.log.info('relevant paths', paths);
-					rv.app.listen(port, (err) => {
+					rv.http = http.createServer(rv.app);
+					rv.http.listen(port, (err) => {
 						if (err) {
 							return reject(err);
 						}
@@ -58,6 +59,11 @@ module.exports = (() => {
 					});
 				});
 			}, bail);
+		},
+		'stop': () => {
+			if (rv.http) {
+				rv.http.close();
+			}
 		},
 		'bootstrap': (launchPath: string): Promise<string> => {
 			rv.init(launchPath);
