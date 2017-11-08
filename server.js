@@ -48,8 +48,9 @@ module.exports = (() => {
 					if (!rv.conf || !rv.log) {
 						return reject('intialization failed');
 					}
-					const port = process.env.NODE_PORT ? process.env.NODE_PORT : rv.conf.get('http.port', 8000);
-					app.listen(port, (err) => {
+					const paths = rv.conf.get('paths'), port = process.env.NODE_PORT ? process.env.NODE_PORT : rv.conf.get('http.port', 8000);
+					rv.log.info('relevant paths', paths);
+					rv.app.listen(port, (err) => {
 						if (err) {
 							return reject(err);
 						}
