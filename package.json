@@ -14,7 +14,7 @@
   },
   "jest": {
     "testEnvironment": "node",
-	 "verbose": true,
+    "verbose": true,
     "transform": {
       "\\.js$": "./dev/jest-transform.js"
     }
@@ -47,6 +47,7 @@
     "babel-jest": "^21.2.0",
     "babel-plugin-transform-flow-strip-types": "^6.22.0",
     "babel-preset-jest": "^21.2.0",
+    "fs-walk": "0.0.1",
     "jest": "^21.2.1",
     "request": "^2.83.0",
     "request-promise": "^4.2.2",
