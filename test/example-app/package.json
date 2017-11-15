@@ -1,6 +1,0 @@
-{
-	"dependencies": {
-		"anotherapp": "1.0",
-		"hex": "git+ssh://localhost//var/git/hex-flow"
-	}
-}

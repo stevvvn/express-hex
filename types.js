@@ -31,6 +31,13 @@ export interface Conf {
 
 export interface App extends Express.Application {}
 
+export interface Bootstrap {
+	conf?: Conf,
+	log?: Logger,
+	init: (string) => void,
+	start: (string) => Promise<string>
+};
+
 /**
  * Should really be something like:
  * {
@@ -60,6 +67,8 @@ export type AnnotatedMiddlewareDef = MiddlewareDef & {
 	name: string
 }
 export type AnnotatedMiddlewareDefs = SMap<AnnotatedMiddlewareDef>
+
+export type PackageFile = JsonObject;
 
 // impossible to instantiate, used for functions that cannot return
 // (while (true); process.exit(); etc)

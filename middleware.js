@@ -22,12 +22,15 @@ const mw: MiddlewareDefs = {
 	'templates': {
 		'description': 'Template engine for views',
 	},
+	'pg': {
+		'description': 'PostgreSQL database connection'
+	},
 	'session': {
-		'description': 'Session management',
-		'deps': [ 'redis' ]
+		'description': 'Session management. Can use Redis, PostgreSQL, or memory storage (in order of preference, determined by whether the middleware to support it is used)',
+		'after': [ 'redis', 'pg' ]
 	},
 	'redis': {
-		'description': 'Promisified Redis client'
+		'description': 'Redis client, with *Async() promisified interface'
 	},
 	'csrf': {
 		'description': 'Request forgery tokens for POST forms',
