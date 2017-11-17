@@ -31,7 +31,7 @@ module.exports = (() => {
 			err = err.error;
 		}
 		console.error(err.toString(), ctx);
-		process.exit();
+		throw err;
 	}
 
 	const rv: Bootstrap = {
@@ -46,9 +46,12 @@ module.exports = (() => {
 			return rv.bootstrap(launchPath).then((): Promise<string> => {
 				return new Promise((resolve, reject) => {
 					if (!rv.conf || !rv.log) {
-						return reject('intialization failed');
+						return reject('initialization failed');
 					}
-					const paths = rv.conf.get('paths'), port = process.env.NODE_PORT ? process.env.NODE_PORT : rv.conf.get('http.port', 8000);
+					const
+						paths = rv.conf.get('paths'),
+						port = process.env.NODE_PORT ? process.env.NODE_PORT : rv.conf.get('http.port', 8000)
+						;
 					rv.log.info('relevant paths', paths);
 					rv.http = http.createServer(rv.app);
 					rv.http.listen(port, (err) => {
@@ -57,7 +60,7 @@ module.exports = (() => {
 						}
 						resolve(`listening on :${ port }`);
 					});
-				});
+				})
 			}, bail);
 		},
 		'stop': () => {
