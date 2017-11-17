@@ -7,7 +7,8 @@ const
 	pkg = JSON.stringify({ 'name': 'init-test-app' }),
 	{ spawn } = require('child_process'),
 	request = require('request-promise'),
-	{ walkSync } = require('fs-walk')
+	{ walkSync } = require('fs-walk'),
+	port = process.env.NODE_PORT || 8000
 	;
 
 jest.timeOut = 30000;
@@ -66,10 +67,22 @@ describe('server behavior', async () => {
 	if (ran) {
 		await ran;
 	}
-	let server, hex;
-	test('server boots', async () => {
+	const hex = require(`${process.cwd()}/index`);
+	let server;
+	test('booting with a bad path errors out', () => {
+		expect(() => {
+			hex.start('/hopefully/this/path/does/not/exist');
+		}).toThrow();
+	});
+
+	test.skip('booting with a bad port errors out', () => {
+		process.env.NODE_PORT = 4242424;
+		expect(hex.start(path.resolve('./test/init-test-app'))).rejects;
+	});
+
+	test('booting from script-initialized app works', async () => {
+		process.env.NODE_PORT = port;
 		expect.assertions(1);
-		hex = require(process.cwd() + '/index');
 		server = hex.start(path.resolve('./test/init-test-app'));
 		await expect(server).resolves.toBeTruthy();
 	});
