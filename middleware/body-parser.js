@@ -11,7 +11,7 @@ module.exports = ({ app, conf }: { app: App, conf: Conf }) => {
 	}
 	bpconf.verify = (req, res, buf, encoding) => {
 		req.rawBody = buf;
-   };
+	};
 	app.use(bodyParser.json(bpconf));
 	app.use(bodyParser.urlencoded(bpconf));
 	app.use(bodyParser.text(bpconf));

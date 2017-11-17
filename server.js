@@ -3,6 +3,8 @@
 import type { SMap, Conf, Logger, Jsonish, Never, Bootstrap } from './types';
 const express = require('express'), http = require('http');
 
+process.on('unhandledRejection', up => { throw up })
+
 module.exports = (() => {
 	const
 		argv: SMap<string> = require('minimist')(process.argv.slice(2).map((arg) => {
