@@ -6,16 +6,16 @@ const
 
 let redis;
 
-const MemoryStore = module.exports = function(app) {
+const RedisStore = module.exports = function(app) {
 	Store.call(this);
 	this.sessions = Object.create(null);
 	redis = app.redis;
 	redis.persistAsync('hex:sessions');
 }
 
-util.inherits(MemoryStore, Store)
+util.inherits(RedisStore, Store)
 
-MemoryStore.prototype.all = function all(cb) {
+RedisStore.prototype.all = function all(cb) {
 	const sessions = {};
 	redis.smembersAsync('hex:sessions')
 		.then((members) => {
@@ -29,7 +29,7 @@ MemoryStore.prototype.all = function all(cb) {
 		})
 }
 
-MemoryStore.prototype.clear = function clear(cb) {
+RedisStore.prototype.clear = function clear(cb) {
 	redis.smembersAsync('hex:sessions')
 		.then((members) => {
 			members.forEach((m) => {
@@ -42,7 +42,7 @@ MemoryStore.prototype.clear = function clear(cb) {
 		});
 }
 
-MemoryStore.prototype.destroy = function destroy(sessionId, cb) {
+RedisStore.prototype.destroy = function destroy(sessionId, cb) {
 	redis.sremAsync('hex:sessions', sessionId)
 		.then(() => {
 			return redis.delAsync('hex:session:' + sessionId);
@@ -52,13 +52,13 @@ MemoryStore.prototype.destroy = function destroy(sessionId, cb) {
 		})
 }
 
-MemoryStore.prototype.get = function get(sessionId, cb) {
+RedisStore.prototype.get = function get(sessionId, cb) {
 	getSession.call(this, sessionId, (sess) => {
 		setImmediate(cb, null, sess);
 	});
 }
 
-MemoryStore.prototype.set = function set(sessionId, session, cb) {
+RedisStore.prototype.set = function set(sessionId, session, cb) {
 	redis.saddAsync('hex:sessions', sessionId)
 		.then(() => {
 			return redis.setAsync('hex:session:' + sessionId, JSON.stringify(session));
@@ -69,12 +69,12 @@ MemoryStore.prototype.set = function set(sessionId, session, cb) {
 		.then(() => { setImmediate(cb); });
 }
 
-MemoryStore.prototype.length = function length(cb) {
+RedisStore.prototype.length = function length(cb) {
 	redis.scardAsync('hex:sessions')
 		.then((len) => { cb(null, len); });
 }
 
-MemoryStore.prototype.touch = function touch(sessionId, session, cb) {
+RedisStore.prototype.touch = function touch(sessionId, session, cb) {
 	getSession.call(this, sessionId, (currentSession) => {
 	  if (currentSession) {
 			currentSession.cookie = session.cookie
