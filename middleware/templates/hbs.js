@@ -29,7 +29,7 @@ module.exports = ({ conf, app }: { conf: Conf }) => {
 			return '';
 		}
 		return Object.keys(ctx.data.root._media).map((file) => {
-			file = `${proxyBase}/${file.replace(/^\//, '')}`;
+			file = `${proxyBase === '/' ? '' : proxyBase}/${file.replace(/^\//, '')}`;
 			if (/[.]js$/.test(file)) {
 				return `<script src="${file}"></script>`;
 			}
