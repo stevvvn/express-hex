@@ -6,7 +6,7 @@ const	bodyParser = require('body-parser');
 
 module.exports = ({ app, conf }: { app: App, conf: Conf }) => {
 	const bpconf = conf.get('bodyParser', {});
-	if (bpconf.extend === undefined) {
+	if (bpconf.extended === undefined) {
 		bpconf.extended = false;
 	}
 	bpconf.verify = (req, res, buf, encoding) => {
