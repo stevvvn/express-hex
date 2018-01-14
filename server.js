@@ -1,7 +1,7 @@
 'use strict';
 // @flow
 import type { SMap, Conf, Logger, Jsonish, Never, Bootstrap } from './types';
-const express = require('express'), http = require('http');
+const express = require('express'), http = require('http'), fs = require('fs');
 
 process.on('unhandledRejection', up => { throw up })
 
@@ -52,16 +52,25 @@ module.exports = (() => {
 					}
 					const
 						paths = rv.conf.get('paths'),
-						port = process.env.NODE_PORT ? process.env.NODE_PORT : rv.conf.get('http.port', 8000)
+						port = (process.env.NODE_PORT ? process.env.NODE_PORT : rv.conf.get('http.port', 8000)).toString().split(':').reverse(),
+						isSocket = /\//.test(port[0])
 						;
+					if (isSocket && fs.existsSync(port[0])) {
+						fs.unlinkSync(port[0]);
+					}
 					rv.log.info('relevant paths', paths);
 					rv.http = http.createServer(rv.app);
-					rv.http.listen(port, (err) => {
+					const args = port.slice(0);
+					args.push((err) => {
 						if (err) {
 							return reject(err);
 						}
-						resolve(`listening on :${ port }`);
+						if (isSocket) {
+							fs.chmodSync(port[0], '777');
+						}
+						resolve(`listening on ${ port.reverse() }`);
 					});
+					rv.http.listen.apply(rv.http, args);
 				})
 			}, bail);
 		},
