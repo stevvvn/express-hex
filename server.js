@@ -43,6 +43,10 @@ module.exports = (() => {
 			rv.log.info(`booting from ${launchPath}`);
 			rv.launchPath = launchPath;
 			rv.app = express();
+			const tp = rv.conf.get('http.trust-proxy', null);
+			if (tp) {
+				rv.app.set('trust proxy', tp);
+			}
 		},
 		'start': (launchPath: string): Promise<string> => {
 			return rv.bootstrap(launchPath).then((): Promise<string> => {
