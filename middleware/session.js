@@ -19,7 +19,7 @@ module.exports = ({ app, conf, log }) => {
 	app.use(session({
 		store,
 		'secret': conf.get('session.secret'),
-		'cookie': { 'path': '/', 'maxAge': conf.get('session.max-age', 60 * 60 * 1000) },
+		'cookie': { 'path': '/' },
 		'resave': false,
 		'saveUninitialized': false,
 		'rolling': conf.get('session.rolling', false)
