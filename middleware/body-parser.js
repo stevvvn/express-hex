@@ -5,7 +5,7 @@ import type { App, Conf } from '../types';
 const	bodyParser = require('body-parser');
 
 module.exports = ({ app, conf }: { app: App, conf: Conf }) => {
-	const bpconf = conf.get('bodyParser', {});
+	const bpconf = conf.get('body-parser', {});
 	if (bpconf.extended === undefined) {
 		bpconf.extended = false;
 	}
