@@ -40,6 +40,7 @@ module.exports = (() => {
 		'init': (launchPath: string): void => {
 			rv.conf = require('./lib/conf')(launchPath);
 			rv.log = require('./lib/log')(rv.conf);
+			rv.log.info(`environment: ${rv.conf.get('env')}`);
 			rv.log.info(`booting from ${launchPath}`);
 			rv.launchPath = launchPath;
 			rv.app = express();
