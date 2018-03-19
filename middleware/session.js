@@ -10,10 +10,10 @@ module.exports = ({ app, conf, log }) => {
 	log.info(`\t\tstore: ${storeName}`);
 
 	if (store.attach) {
-		store = store.attach({ app, conf, session });
+		app.locals.sessionStore = store = store.attach({ app, conf, session });
 	}
 	else {
-		store = new store(app);
+		app.locals.sessionStore = store = new store(app);
 	}
 
 	app.use(session({
