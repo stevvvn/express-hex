@@ -44,6 +44,7 @@ module.exports = (() => {
 			rv.log.info(`booting from ${launchPath}`);
 			rv.launchPath = launchPath;
 			rv.app = express();
+			rv.http = http.createServer(rv.app);
 			const tp = rv.conf.get('http.trust-proxy', null);
 			if (tp) {
 				rv.app.set('trust proxy', tp);
@@ -64,7 +65,6 @@ module.exports = (() => {
 						fs.unlinkSync(port[0]);
 					}
 					rv.log.info('relevant paths', paths);
-					rv.http = http.createServer(rv.app);
 					const args = port.slice(0);
 					args.push((err) => {
 						if (err) {
@@ -89,7 +89,7 @@ module.exports = (() => {
 			return require('./lib/middleware')(rv.context());
 		},
 		'context': () => {
-			return { express, 'app': rv.app, 'launchPath': rv.launchPath, 'log': rv.log, 'conf': rv.conf };
+			return { express, 'app': rv.app, 'http': rv.http, 'launchPath': rv.launchPath, 'log': rv.log, 'conf': rv.conf };
 		}
 	};
 	return rv;
