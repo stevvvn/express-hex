@@ -7,9 +7,14 @@ module.exports = ({ app, log }) => {
 		}
 		if (res.renderer) {
 			res.renderer
-				.then(({ type, body }) => {
+				.then(({ type, body, headers }) => {
 					if (type) {
 						res.type(type);
+					}
+					if (headers) {
+						Object.keys(headers).forEach((k) => {
+							res.header(k, headers[k]);
+						});
 					}
 					if (body.length) {
 						res.send(body);
@@ -17,12 +22,6 @@ module.exports = ({ app, log }) => {
 					res.end();
 				}, (err) => { throw err })
 				.then(() => {}, (err) => { throw err });
-		}
-		else if (res.content) {
-			if (!res.status().statusCode) {
-				res.status(200);
-			}
-			res.send(res.content).end();
 		}
 		else {
 			next();

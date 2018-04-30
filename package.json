@@ -10,7 +10,7 @@
     "hex-init": "bin/init"
   },
   "scripts": {
-    "test": "node_modules/.bin/jest"
+    "test": "jest"
   },
   "jest": {
     "testEnvironment": "node",
@@ -22,27 +22,13 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "bluebird": "^3.5.1",
-    "body-parser": "^1.18.2",
-    "connect-pg-simple": "^4.2.1",
-    "csurf": "^1.9.0",
     "debug": "^3.1.0",
     "express": "^4.16.2",
-    "express-hbs": "^1.0.4",
-    "express-session": "^1.15.6",
     "flow-remove-types": "^1.2.3",
     "init-package-json": "^1.10.1",
     "inquirer": "^3.3.0",
-    "js-yaml": "^3.10.0",
-    "json-stringify-safe": "^5.0.1",
     "migrations": "^0.1.7",
-    "minimist": "^1.2.0",
-    "morgan": "^1.9.0",
-    "pg": "^7.4.0",
-    "redis": "^2.8.0",
-    "remark": "^8.0.0",
-    "remark-html": "^6.0.1",
-    "supports-color": "^5.0.0"
+    "minimist": "^1.2.0"
   },
   "devDependencies": {
     "babel-jest": "^21.2.0",

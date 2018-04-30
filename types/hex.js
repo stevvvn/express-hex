@@ -1,8 +1,6 @@
 'use strict';
 // @flow
 
-import * as Express from './express-types';
-
 export type SMap<T> = { [ key: string ]: T }
 
 export type LogMethod = (msg: string, ctx?: Jsonish) => void
@@ -28,8 +26,6 @@ export interface Conf {
 	set: (key: string, val: any, setter?: ?(targ: any, key: string) => void) => Conf,
 	push: (key: string, val: any) => Conf
 };
-
-export interface App extends Express.Application {}
 
 export interface Bootstrap {
 	conf?: Conf,
