@@ -1,5 +1,5 @@
 {
-  "name": "hex",
+  "name": "express-hex",
   "version": "1.0.2",
   "description": "Cooperative Express middleware",
   "directories": {
