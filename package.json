@@ -26,8 +26,6 @@
     "express": "^4.16.2",
     "flow-remove-types": "^1.2.3",
     "init-package-json": "^1.10.1",
-    "inquirer": "^3.3.0",
-    "migrations": "^0.1.7",
     "minimist": "^1.2.0"
   },
   "devDependencies": {
