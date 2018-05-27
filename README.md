@@ -131,17 +131,3 @@ If you specify a path in your conf.js under the key `log.auth`, authorization-re
 
 Finally, there is the access log level, which is meant to be managed by the `access-log` middleware, which itself uses [`morgan`](https://github.com/expressjs/morgan). This log format is specified in conf.js under `log.access.format`.
 
-### Migrations
-
-The initialization routine installs `migrate.js`, which can be used to manage and apply changes to whatever database engine(s) your app is interested in.
-
-Running `node migrate.js` will give you more info about how to use it.
-
-It's similar to any number of other migration schemes, but keep in mind:
-
- 1. It's database agnostic. Migrations are grouped under `migrations/$MIDDLEWARE_NAME` where $MIDDLEWARE_NAME is middleware that relies on the schema.
- 2. Running migrations (up or down) invokes your app's middleware stack. Doing so means that only migrations for things you actually use are considered.
- 3. Migrations files export an up method, and optionally a down method. If there is no down method an error is thrown on attempts to roll it back.
- 4. The arguments passed to up() and down() are exactly the same as those passed to middleware when the server is running. So, for example, postgres connections gets set as `app.pg`, so you'd look for it there in either case.
- 5. up() and down() must either use sychronous APIs or return a promise. (Database interactions are designed to be promise-y anyway, so it's easy. For example, `return app.pg.query('... sql ...');` is valid, and `return app.redis.setAsync('key', 'value')`)
-
