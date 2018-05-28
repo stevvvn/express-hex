@@ -1,6 +1,6 @@
 {
   "name": "express-hex",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "Cooperative Express middleware",
   "directories": {
     "test": "test"
@@ -25,6 +25,7 @@
     "debug": "^3.1.0",
     "express": "^4.16.2",
     "flow-remove-types": "^1.2.3",
+    "hex-object": "^1.1.0",
     "init-package-json": "^1.10.1",
     "minimist": "^1.2.0"
   },
