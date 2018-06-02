@@ -1,13 +1,12 @@
 {
   "name": "express-hex",
-  "version": "1.2.2",
+  "version": "1.2.3",
   "description": "Cooperative Express middleware",
   "directories": {
     "test": "test"
   },
   "bin": {
-    "hex-conf": "bin/conf",
-    "hex-init": "bin/init"
+    "hex-conf": "bin/conf"
   },
   "scripts": {
     "test": "jest"
