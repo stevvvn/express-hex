@@ -86,6 +86,9 @@ module.exports = {
 };
 ```
 
+The structure of configuration parameters is up to the libraries that consume them.
+
+
 #### CLI access
 Since these files can contain dynamic elements, they're inconvenient to work with from outside of the JS world, so `bin/hex-conf` is installed to access configuration data through the CLI:
 
