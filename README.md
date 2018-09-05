@@ -140,7 +140,7 @@ You can organize for something like `nginx` to serve static files for you or you
 #### Middleware API
 Your module should export a function that will be passed `{ log, conf, app, http, express }`.
 
-`log` is an instance of `debug`, containing methods corresponding to the log levels `[ 'emerg', 'alert', 'crit', 'error', 'warn', 'notice', 'info', 'debug', 'access' ]`. You may call any of these with a string for the first argument, and optionally an object for context in the second argument.
+`log` contains methods corresponding to the log levels `[ 'emerg', 'alert', 'crit', 'error', 'warn', 'notice', 'info', 'debug', 'access' ]`. You may call any of these with a string for the first argument, and optionally an object for context in the second argument.
 
 `conf` is an instance of [`hex-object`](https://bitbucket.org/snyder13/hex-object/). You can read more there, but basically it's an interface to your `conf.js` and `secrets.js` with `get(path, default)` and `set(path, value)` where `path` accepts dotted notation.
 
