@@ -8,20 +8,20 @@ Hex apps and libraries define a `middleware.js` that details what functionality 
 *hex-forms/middleware.js*
 ```js
 module.exports = {
-        'csrf': {
-                'description': 'Request forgery tokens for POST forms',
-                'deps': [ 'session', 'hex.body-parser' ]
-        },
-		  'captcha': {
-			  'description': 'Robot prevention'
-		  },
-        'session': {
-                'description': 'Session management that should live in a different library, but just for demo purposes it is here',
-                'after': [ 'hex-redis.connection' ]
-        },
-        'base': {
-                'bundle': [ 'session', 'csrf', 'captcha' ]
-        }
+	'csrf': {
+		'description': 'Request forgery tokens for POST forms',
+		'deps': [ 'session', 'hex.body-parser' ]
+	},
+	'captcha': {
+		'description': 'Robot prevention'
+	},
+	'session': {
+		'description': 'Session management that should live in a different library, but just for demo purposes it is here',
+		'after': [ 'hex-redis.connection' ]
+	},
+	'base': {
+		'bundle': [ 'session', 'csrf', 'captcha' ]
+	}
 };
 ```
 
