@@ -134,6 +134,8 @@ $ curl http://localhost:8000
 It's working, sort of!
 ```
 
+(You can define `NODE_PORT` to change the default of 8000, or set `http.port` in conf.js)
+
 #### Static files
 You can organize for something like `nginx` to serve static files for you or you can include them in a path called `public` in your application root. Libraries can also have `public` directories that are set to be served by Express when any of their middleware is required.
 
