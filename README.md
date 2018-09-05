@@ -108,13 +108,15 @@ Ubiquitous Express middleware for parsing incoming requests into sensible JS obj
 
 ### Writing new middleware
 
+You can check out a skeleton that contains the few files you need to get started:
+
 ```sh
 $ git clone https://bitbucket.org/snyder13/hex-template-minimal <target dir>
 $ cd <target dir>
 $ yarn install
 $ DEBUG=hex:* yarn start
 yarn run v1.5.1
-$ node server.js
+$ node server.js &
   hex:info environment: development +0ms
   hex:info booting from <target dir> +2ms
   hex:debug loading middleware definitions - {"path":",<target dir>/middleware.js","app":"target"} +0ms
