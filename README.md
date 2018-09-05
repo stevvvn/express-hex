@@ -107,7 +107,7 @@ $ cd /app/path/for/example/hex-contact && NODE_ENV=production node_modules/.bin/
 
 #### body-parser
 
-Ubiquitous Express middleware for parsing incoming requests into sensible JS objects. Reads `body-parser` from `conf.js`, where they keys there correspond to the options documented for that library: https://www.npmjs.com/package/body-parser
+Ubiquitous Express middleware for parsing incoming requests into sensible JS objects. Reads `body-parser` from `conf.js`, where they keys there correspond to the [options documented for that library](https://www.npmjs.com/package/body-parser).
 
 
 ### Writing new middleware
