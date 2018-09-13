@@ -20,6 +20,6 @@ else {
 	path = process.cwd();
 	keyIdx = 2;
 }
-const val = require('./lib/conf')(path).get(process.argv[keyIdx]);
+const val = require('../lib/conf')(path).get(process.argv[keyIdx]);
 console.log(typeof val === 'object' ? JSON.stringify(val) : val);
 /// vi: ft=javascript

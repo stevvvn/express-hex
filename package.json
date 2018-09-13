@@ -1,13 +1,12 @@
 {
   "name": "express-hex",
-  "version": "1.2.2",
+  "version": "1.2.5",
   "description": "Cooperative Express middleware",
   "directories": {
     "test": "test"
   },
   "bin": {
-    "hex-conf": "bin/conf",
-    "hex-init": "bin/init"
+    "hex-conf": "bin/conf"
   },
   "scripts": {
     "test": "jest"
@@ -28,6 +27,7 @@
     "flow-remove-types": "^1.2.3",
     "hex-object": "^1.1.0",
     "init-package-json": "^1.10.1",
+    "json-stringify-safe": "^5.0.1",
     "minimist": "^1.2.0"
   },
   "devDependencies": {
