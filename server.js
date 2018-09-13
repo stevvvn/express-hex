@@ -39,6 +39,8 @@ module.exports = (() => {
 	const rv: Bootstrap = {
 		'init': (launchPath: string): void => {
 			rv.conf = require('./lib/conf')(launchPath);
+			const port = (process.env.NODE_PORT ? process.env.NODE_PORT : rv.conf.get('http.port', 8000)).toString().split(':').reverse();
+			rv.conf.set('http.port', port);
 			rv.log = require('./lib/log')(rv.conf);
 			rv.log.info(`environment: ${rv.conf.get('env')}`);
 			rv.log.info(`booting from ${launchPath}`);
@@ -58,7 +60,7 @@ module.exports = (() => {
 					}
 					const
 						paths = rv.conf.get('paths'),
-						port = (process.env.NODE_PORT ? process.env.NODE_PORT : rv.conf.get('http.port', 8000)).toString().split(':').reverse(),
+						port = rv.conf.get('http.port'),
 						isSocket = /\//.test(port[0])
 						;
 					if (isSocket && fs.existsSync(port[0])) {
