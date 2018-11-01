@@ -15,7 +15,8 @@ export type Logger = {
 	warn: LogMethod,
 	notice: LogMethod,
 	info: LogMethod,
-	debug: LogMethod
+	debug: LogMethod,
+	auth?: LogMethod
 }
 
 // types that convert losslessly to JSON
