@@ -1,8 +1,12 @@
 'use strict';
+// @flow
+
 const bodyParser = require('body-parser');
 const obj = require('hex-object');
 
-module.exports = ({ app, conf }) => {
+import type { Context } from '../types/hex';
+
+module.exports = ({ app, conf }: Context) => {
 	const settings = obj.wrap({
 		'extended': false,
 		'verify': (req, res, buf, encoding) => {

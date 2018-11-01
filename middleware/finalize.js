@@ -1,6 +1,9 @@
 'use strict';
+// @flow
 
-module.exports = ({ app, log }) => {
+import type { Context } from '../types/hex';
+
+module.exports = ({ app, log }: Context) => {
 	app.use((req, res, next) => {
 		if (res.headersSent) {
 			return next();

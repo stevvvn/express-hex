@@ -1,6 +1,6 @@
 'use strict';
 // @flow
-import type { MiddlewareDefs } from './types';
+import type { MiddlewareDefs } from './types/hex';
 
 const mw: MiddlewareDefs = {
 	'body-parser': {
