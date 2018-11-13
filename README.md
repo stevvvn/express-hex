@@ -1,147 +1,150 @@
-## What
-Hex is a way to partition different [Express](https://github.com/expressjs/express) apps that work together.
+# What is Hex?
+Hex is a scheme for organizing Express middleware as a tree of dependencies rather than as a linear stack, and a common way to structure application configuration files.
 
-It's similar to Express's built in support for sub-applications ([example](https://github.com/derickbailey/express-sub-app-demo)), but it works by dependency resolution, which hopefully makes it easier to include things into your application without reorganize existing code.
+### `middleware.js`
 
-Additionally, it provides a common configuration scheme, logging based on [debug](https://www.npmjs.com/package/debug), and some commonly useful middleware.
+Hex apps and libraries define a `middleware.js` that details what functionality they provide:
 
-### Terms
- * host application: this is the application that starts the server, by calling `require('hex').start(__dirname)`
- * libraries: the converse, applications that provide functionality to the host application but which are not considered to be "in control" by hex
-
-Sometimes an application can work as either a host or a library depending on context. The determination is made based on whether it is the one that calls `start`
-
-### Initializing a new application
-
- 1. Install hex: `npm install --save git+https://bitbucket.org/snyder13/hex.git`
- 2. Run the init script: `node_modules/.bin/hex-init`
- 3. Answer some questions about your app from npm's `init` where applicable
- 4. Select a template to install based on your needs. Currently there's just one default, so hopefully that suits your needs. This will print out an overview of the files it installs.
-
-### Running the server
-
-#### Ad-hoc
-`NODE_PORT=8000 DEBUG=hex:* npm start` (port defaults to what's in your conf.js under `http.port`, or failing that 8000)
-
-#### Managed
- 1. Install `pm2` once: `# npm install -g pm2`
- 2. `NODE_PORT=8000 pm2 start ./ecosystem.config.js`
-
-[Read more about `pm2`](https://github.com/Unitech/pm2)
-
-Fresh off initialization, visiting `http://localhost:8000` should show a "Hello, world"-ish message. That's not terribly interesting, but you can use the scaffold to develop other (likely also uninteresting) functionality:
-
-### Middleware
-First, a cut-down example of a middleware declaration:
-```javascript
+*hex-forms/middleware.js*
+```js
 module.exports = {
-        'session': {
-                'description': 'Session management',
-                'after': [ 'redis' ]
-        },
-        'redis': {
-                'description': 'Promisified Redis client'
-        },
-        'body-parser': {
-                'description': 'Convert POST bodies to native data'
-        },
-        'csrf': {
-                'description': 'Request forgery tokens for POST forms',
-                'deps': [ 'session', 'body-parser' ]
-        },
-        'base': {
-                'bundle': [ 'session', 'body-parser' ]
-        }
-};
-```
-
-This file serves two purposes: for libraries, it shows which functionality it can provide, and for hosts it shows through dependencies which libraries to bring in to support it.
-
-These keys mean:
-  * `description`: optional documentation of what the middleware does, logged when it's booted
-  * `deps`: optional list of middleware which must be loaded before this one
-  * `after`: optional list of middleware which could be used if they're available but which are not required
-  * `bundle`: special case, which simply makes that name expand to the indicated middleware anywhere it is indicated
-
-All the middleware in the example references other middleware in the same file, but for a host application there is likely a need to specify dependencies on middleware from other libraries. This is done by prefixing the library name and a period to the desired middleware.
-
-Consider an example host application's `middleware.js`:
-```javascript
-module.exports = {
-	'foo': { },
-	'index': {
-		'deps': [ 'foo', 'hex.base', 'hex.redis', 'hex-authn-passport.google' ]
-	}
-};
-```
-
-This would load the `index` and `foo` middleware from the example host, `foo` first, bring in hex's `session` and `body-parser` middleware by way of the `base` bundle, as well as `redis` since it was named directly, and `google` from another library.
-
-See the actual `middleware.js` in the hex source for a list of the common utilities that are bundled.
-
-### Configuration
-The host application can include two files, `conf.js` and `secrets.js`.
-
-Both of these files export objects declaring whatever parameters are relevant to the application. `secrets.js`, as you might expect contains private data and should not be committed, while `conf.js` can be shared. These two files are glommed together at runtime to make a description of both, for example:
-
-#### `conf.js`
-```javascript
-module.exports = {
+	'csrf': {
+		'description': 'Request forgery tokens for POST forms',
+		'deps': [ 'session', 'hex.body-parser' ]
+	},
+	'captcha': {
+		'description': 'Robot prevention'
+	},
 	'session': {
-		// cookie parameter passed to express-session
-		'max-age': 60 * 60 * 1000
+		'description': 'Session management that should live in a different library, but just for demo purposes it is here',
+		'after': [ 'hex-redis.connection' ]
+	},
+	'base': {
+		'bundle': [ 'session', 'csrf', 'captcha' ]
 	}
 };
 ```
 
-#### `secrets.js`
-```javascript
+Here, `csrf` has a hard dependency on `session`, so if it is loaded `session` is always loaded first. It also imports the only middleware provided directly by `hex`, `body-parser` ("Included Middleware" below).
+
+`captcha` is self-sufficient.
+
+`session` can use but does not require a Redis connection. `after` specifies that `session` is loaded afterward if the connection is specified directly elsewhere, so it can decide on instantiation whether to use it.
+
+Bundles like `base` can be used to group together functionality that are likely to be used together.
+
+
+An application using this library defines its middleware similarly:
+
+*hex-contact/middleware.js*
+```js
 module.exports = {
-	'session': {
-		// used to sign session id cookie, should be private to prevent tampering
-		'secret': 'kcOt3PDsz6Zesg1jVw8oJ4T0RIc7sAne3JEql7dqLkBVJ'
+	'contact': {
+		'description': 'Contact form for info about our upcoming product',
+		'deps': [ 'hex-forms.csrf', 'hex-redis.connection' ]
+	},
+	'typography': {
+		'description': 'Load typefaces from Google'
 	}
+}
+```
+
+Starting a Hex application is as simple as `require('express-hex').start('/app/path/for/example/hex-contact'); // => Promise`
+
+The `middleware.js` in the given startup path is loaded, and everything in it mentions is loaded and re-ordered to satisfy dependencies and `after` stipulations.
+
+Here, the `contact` middleware requires `csrf` from `hex-forms`, which in turn brings in its `session` middleware, and `hex.body-parser`. Because `hex-contact.contact` also explicitly names the Redis connection, it'll be loaded prior to `hex-forms.session` so it can use it. `hex-forms.captcha` is not loaded here because there isn't a path referencing it from the "base" `middleware.js` loaded from `hex-contact`.
+
+`typography` politely goes along without requiring any dependencies or ordering requests.
+
+In order for Hex to be able to locate libraries, they should be in `package.json` and exist in `node_modules/$LIB_NAME` (e.g., `node_modules/hex-forms`) per usual.
+
+
+### conf.js
+
+Hex also loads `conf.js` and (if it exists) `secrets.js` from the base path it's started with.
+
+These are similar to JSON except that they are JavaScript, so you can do dynamic stuff and add comments. For example, to support that Redis connection:
+
+*hex-contact/conf.js*
+```js
+module.exports {
+	'redis': {
+		'host': `redis.${ require('os').hostname }`,    // DNS has server location
+		'port': 7000,
+		'db': /^dev/.test(process.env.NODE_ENV) ? 1 : 0 // use different catalog for dev vs prod
+	}
+}
+```
+
+`conf.js` is designed to be checked in to version control, while `secrets.js` contains anything you'd rather not. Additionally, these files support a shortcut notation to specify keys in a deeper structure using dots:
+
+*hex-contact/secrets.js*
+```js
+module.exports = {
+	'redis.auth.pass': 'super secret' // == { 'redis': { 'auth': { 'pass': 'super secret' } } }
 };
 ```
 
-There is a utility included, `hex-conf`, which can be run in the same path as these two files to see what this looks to the application:
-```bash
-$ node node_modules/.bin/hex-conf
-{"session":{"max-age":3600000,"secret":"kcOt3PDsz6Zesg1jVw8oJ4T0RIc7sAne3JEql7dqLkBVJ"}}
+The structure of configuration parameters is up to the libraries that consume them.
+
+
+#### CLI access
+Since these files can contain dynamic elements, they're inconvenient to work with from outside of the JS world, so `bin/hex-conf` is installed to access configuration data through the CLI:
+
+```sh
+$ cd /app/path/for/example/hex-contact && node_modules/.bin/hex-conf
+{"redis":{"host":"redis.diesel","port":7000,"db":1,"auth":{"pass":"super secret"}},"env":"development"}
 ```
 
-You can also specify a path to a specific key of interest, using periods to indicate depth:
-```bash
-$ node node_modules/.bin/hex-conf session.secret
-kcOt3PDsz6Zesg1jVw8oJ4T0RIc7sAne3JEql7dqLkBVJ
+Note `env` added, you can also supply it, and you can ask for a specific key (or a dotted path to a key):
+```sh
+$ cd /app/path/for/example/hex-contact && NODE_ENV=production node_modules/.bin/hex-conf redis.db
+0
 ```
-(Note scalar values are not JSON-encoded, so if you want to script external tools on the application's configuration values you don't have to worry about it.)
 
-Hex middleware is instantiated with `{ conf }`, an object that works similarly. It exposes a `get(path, default=undefined)` method, which will get you you the data at the specified path. If the parameter isn't found, the `default` is returned if provided. If `default === undefined`, missing parameters throw errors. (Note strict equality -- use can use `null` for `default` if you don't care whether the parameter is set and don't have your own fallback value in mind.)
+### Included middleware
 
-### Logging
+#### body-parser
 
-This software uses the [`debug` module](https://github.com/visionmedia/debug) and the namespace `hex`. You will get minimal (or no) output unless you specify the `DEBUG` enviornment variable. `DEBUG=hex:*` will show all messages originating from hex, while `DEBUG=*` will show more information coming from other libraries that use `debug`, notably `express`.
+Ubiquitous Express middleware for parsing incoming requests into sensible JS objects. Reads `body-parser` from `conf.js`, where they keys there correspond to the [options documented for that library](https://www.npmjs.com/package/body-parser).
 
-You can also listen only to certain log levels, e.g., `DEBUG=hex:warn,hex:error`
 
-Hex regularly emits events at the info, warn, debug, and error levels. There are some more available because they are standard, but are not (currently) used: emerg, alert, crit, notice.
+### Writing new middleware
 
-If you specify a path in your conf.js under the key `log.auth`, authorization-related messages will be sent there. This design is to aid the scripting of fail2ban, which can monitor said file.
+You can check out a skeleton that contains the few files you need to get started:
 
-Finally, there is the access log level, which is meant to be managed by the `access-log` middleware, which itself uses [`morgan`](https://github.com/expressjs/morgan). This log format is specified in conf.js under `log.access.format`.
+```sh
+$ git clone https://bitbucket.org/snyder13/hex-template-minimal <target dir>
+$ cd <target dir>
+$ yarn install
+$ DEBUG=hex:* yarn start
+yarn run v1.5.1
+$ node server.js &
+  hex:info environment: development +0ms
+  hex:info booting from <target dir> +2ms
+  hex:debug loading middleware definitions - {"path":",<target dir>/middleware.js","app":"target"} +0ms
+  hex:debug loading middleware definitions - {"path":"<target dir>/node_modules/express-hex/lib/../middleware.js","app":"hex"} +2ms
+  hex:debug required middleware - {"target.index":{"description":"Main page","app":"target","name":"index"}} +2ms
+  hex:info requiring middleware: +22ms
+  hex:info      target.index - Main page +0ms
+  hex:info relevant paths - {"launch":"<target dir>"} +4ms
+  hex:info listening on 8000 +4ms
+$ curl http://localhost:8000
+It's working, sort of!
+```
 
-### Migrations
+(You can define `NODE_PORT` to change the default of 8000, or set `http.port` in conf.js)
 
-The initialization routine installs `migrate.js`, which can be used to manage and apply changes to whatever database engine(s) your app is interested in.
+#### Static files
+You can organize for something like `nginx` to serve static files for you or you can include them in a path called `public` in your application root. Libraries can also have `public` directories that are set to be served by Express when any of their middleware is required.
 
-Running `node migrate.js` will give you more info about how to use it.
+#### Middleware API
+Your module should export a function that will be passed `{ log, conf, app, http, express }`.
 
-It's similar to any number of other migration schemes, but keep in mind:
+`log` contains methods corresponding to the log levels `[ 'emerg', 'alert', 'crit', 'error', 'warn', 'notice', 'info', 'debug', 'access' ]`. You may call any of these with a string for the first argument, and optionally an object for context in the second argument.
 
- 1. It's database agnostic. Migrations are grouped under `migrations/$MIDDLEWARE_NAME` where $MIDDLEWARE_NAME is middleware that relies on the schema.
- 2. Running migrations (up or down) invokes your app's middleware stack. Doing so means that only migrations for things you actually use are considered.
- 3. Migrations files export an up method, and optionally a down method. If there is no down method an error is thrown on attempts to roll it back.
- 4. The arguments passed to up() and down() are exactly the same as those passed to middleware when the server is running. So, for example, postgres connections gets set as `app.pg`, so you'd look for it there in either case.
- 5. up() and down() must either use sychronous APIs or return a promise. (Database interactions are designed to be promise-y anyway, so it's easy. For example, `return app.pg.query('... sql ...');` is valid, and `return app.redis.setAsync('key', 'value')`)
+`conf` is an instance of [`hex-object`](https://bitbucket.org/snyder13/hex-object/). You can read more there, but basically it's an interface to your `conf.js` and `secrets.js` with `get(path, default)` and `set(path, value)` where `path` accepts dotted notation.
+
+`app`, `http`, and `express` are all what you would expect from the [Express documentation](http://expressjs.com/). See in particular [Express: Writing middleware](http://expressjs.com/en/guide/writing-middleware.html).
 

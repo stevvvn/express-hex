@@ -1,7 +1,14 @@
 'use strict';
 // @flow
-import type { SMap, Conf, Logger, Jsonish, Never, Bootstrap } from './types';
-const express = require('express'), http = require('http'), fs = require('fs');
+import type { SMap, Conf, Logger, Jsonish, Never, Bootstrap } from './types/hex';
+
+const express = require('express');
+const http = require('http');
+const fs = require('fs');
+
+const middleware: any = require('./lib/middleware');
+const logger = require('./lib/log');
+const config = require('./lib/conf');
 
 process.on('unhandledRejection', up => { throw up })
 
@@ -37,32 +44,42 @@ module.exports = (() => {
 	}
 
 	const rv: Bootstrap = {
-		'init': (launchPath: string): void => {
-			rv.conf = require('./lib/conf')(launchPath);
-			rv.log = require('./lib/log')(rv.conf);
-			rv.log.info(`environment: ${rv.conf.get('env')}`);
-			rv.log.info(`booting from ${launchPath}`);
+		'init': (launchPath) => {
+			const conf = rv.conf = config(launchPath);
+			const port = (process.env.NODE_PORT ? process.env.NODE_PORT : conf.get('http.port', 8000)).toString().split(':').reverse();
+			conf.set('http.port', port);
+			const log = rv.log = logger(conf);
+			log.info(`environment: ${ conf.get('env') }`);
+			log.info(`booting from ${ launchPath }`);
 			rv.launchPath = launchPath;
 			rv.app = express();
 			rv.http = http.createServer(rv.app);
-			const tp = rv.conf.get('http.trust-proxy', null);
-			if (tp) {
+			const tp = conf.get('http.trust-proxy', null);
+			if (tp && rv.app) {
 				rv.app.set('trust proxy', tp);
 			}
 		},
-		'start': (launchPath: string): Promise<string> => {
+		'start': (launchPath) => {
 			return rv.bootstrap(launchPath).then((): Promise<string> => {
 				return new Promise((resolve, reject) => {
-					if (!rv.conf || !rv.log) {
+					if (!rv.conf) {
 						return reject('initialization failed');
 					}
-					const
-						paths = rv.conf.get('paths'),
-						port = (process.env.NODE_PORT ? process.env.NODE_PORT : rv.conf.get('http.port', 8000)).toString().split(':').reverse(),
-						isSocket = /\//.test(port[0])
-						;
+					const paths = rv.conf ? rv.conf.get('paths') : null;
+					if (paths === null) {
+						return reject('initialization failed');
+					}
+					const port = rv.conf ? rv.conf.get('http.port') : null;
+					if (port === null) {
+						return reject('initialization failed');
+					}
+					const isSocket = /\//.test(port[0]);
+
 					if (isSocket && fs.existsSync(port[0])) {
 						fs.unlinkSync(port[0]);
+					}
+					if (!rv.log) {
+						return reject('initialization failed');
 					}
 					rv.log.info('relevant paths', paths);
 					const args = port.slice(0);
@@ -75,6 +92,9 @@ module.exports = (() => {
 						}
 						resolve(`listening on ${ port.reverse() }`);
 					});
+					if (!rv.http) {
+						return reject('initialization failed');
+					}
 					rv.http.listen.apply(rv.http, args);
 				})
 			}, bail);
@@ -84,12 +104,22 @@ module.exports = (() => {
 				rv.http.close();
 			}
 		},
-		'bootstrap': (launchPath: string): Promise<string> => {
+		'bootstrap': (launchPath) => {
 			rv.init(launchPath);
-			return require('./lib/middleware')(rv.context());
+			return middleware(rv.context());
 		},
 		'context': () => {
-			return { express, 'app': rv.app, 'http': rv.http, 'launchPath': rv.launchPath, 'log': rv.log, 'conf': rv.conf };
+			if (!rv.launchPath || !rv.http || !rv.log || !rv.conf) {
+				throw new Error('initialization failed');
+			}
+			return {
+				express,
+				'app': rv.app,
+				'http': rv.http,
+				'launchPath': rv.launchPath,
+				'log': rv.log,
+				'conf': rv.conf
+			};
 		}
 	};
 	return rv;

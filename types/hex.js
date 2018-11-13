@@ -1,6 +1,9 @@
 'use strict';
 // @flow
 
+import type express from './express';
+import type { Server } from 'http';
+
 export type SMap<T> = { [ key: string ]: T }
 
 export type LogMethod = (msg: string, ctx?: Jsonish) => void
@@ -12,7 +15,8 @@ export type Logger = {
 	warn: LogMethod,
 	notice: LogMethod,
 	info: LogMethod,
-	debug: LogMethod
+	debug: LogMethod,
+	auth?: LogMethod
 }
 
 // types that convert losslessly to JSON
@@ -23,15 +27,31 @@ export type Jsonish = JsonScalar|JsonArray|JsonObject
 
 export interface Conf {
 	get: (key?: string, def?: any) => any,
-	set: (key: string, val: any, setter?: ?(targ: any, key: string) => void) => Conf,
+	set: (key: string, val: any, setter?: (targ: any, key: string) => void) => Conf,
 	push: (key: string, val: any) => Conf
+};
+
+export type Middleware = (Context) => void|Promise<void>;
+
+export interface Context {
+	express: express,
+	app: express.Application,
+	http: Server,
+	launchPath: string,
+	log: Logger,
+	conf: Conf
 };
 
 export interface Bootstrap {
 	conf?: Conf,
 	log?: Logger,
+	launchPath?: string,
+	http?: Server,
+	app?: express.Application,
+	context: () => Context,
 	init: (string) => void,
-	start: (string) => Promise<string>
+	start: (string) => Promise<string>,
+	bootstrap: (string) => Promise<string>
 };
 
 /**
