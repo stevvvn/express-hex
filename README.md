@@ -64,7 +64,7 @@ In order for Hex to be able to locate libraries, they should be in `package.json
 
 Hex also loads `conf.js` and (if it exists) `secrets.js` from the base path it's started with.
 
-These are similar to JSON except that they are JavaScript, so you can do dynamic stuff and add comments. For example, to support that Redis connection:
+These export JSON-ish maps of configuration parameters. You are allowed to add comments and to have dynamic behavior. For example, to support that Redis connection:
 
 *hex-contact/conf.js*
 ```js
@@ -72,7 +72,7 @@ module.exports {
 	'redis': {
 		'host': `redis.${ require('os').hostname }`,    // DNS has server location
 		'port': 7000,
-		'db': /^dev/.test(process.env.NODE_ENV) ? 1 : 0 // use different catalog for dev vs prod
+		'db': /^prod/.test(process.env.NODE_ENV) ? 0 : 1 // use different catalog for prod vs dev
 	}
 }
 ```
@@ -87,6 +87,24 @@ module.exports = {
 ```
 
 The structure of configuration parameters is up to the libraries that consume them.
+
+There is an alternative to testing `process.env.NODE_ENV` when specifying environment-specific variables, which is to nest the key you want to override inside `dev`, `test` or `prod` root keys.
+
+For example, equivalent to above:
+```js
+module.exports {
+	'redis': {
+		'host': `redis.${ require('os').hostname }`,    // DNS has server location
+		'port': 7000
+	},
+	'dev': {
+		'redis.db': 1
+	},
+	'prod': {
+		'redis.db': 0
+	}
+}
+```
 
 
 #### CLI access
