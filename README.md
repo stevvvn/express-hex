@@ -121,6 +121,14 @@ $ cd /app/path/for/example/hex-contact && NODE_ENV=production node_modules/.bin/
 0
 ```
 
+#### Migrations
+
+`hex-migrate` is included to run all migrations for middleware you depend on that applies to stores you have enabled.
+
+(A store is considered to be enabled if you depend on `hex-db-$STORE.handle` in any part of your `middleware.js`)
+
+The command will apply all the migrations it can. If you need to use a more fine-grained approach with migrations, the `abstract-migrator` package can be used to apply or remove specific migrations individually. (`yarn global add abstract-migrator` then `$ amigrate` for instructions)
+
 ### Included middleware
 
 #### body-parser

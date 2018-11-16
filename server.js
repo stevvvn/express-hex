@@ -104,9 +104,10 @@ module.exports = (() => {
 				rv.http.close();
 			}
 		},
-		'bootstrap': (launchPath) => {
+		'bootstrap': async (launchPath) => {
 			rv.init(launchPath);
-			return middleware(rv.context());
+			await middleware(rv.context());
+			return rv.context();
 		},
 		'context': () => {
 			if (!rv.launchPath || !rv.http || !rv.log || !rv.conf) {
