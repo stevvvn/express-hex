@@ -58,6 +58,7 @@ module.exports = (() => {
 			if (tp && rv.app) {
 				rv.app.set('trust proxy', tp);
 			}
+			return rv.context();
 		},
 		'start': (launchPath) => {
 			return rv.bootstrap(launchPath).then((): Promise<string> => {

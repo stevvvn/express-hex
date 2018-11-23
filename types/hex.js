@@ -49,9 +49,9 @@ export interface Bootstrap {
 	http?: Server,
 	app?: express.Application,
 	context: () => Context,
-	init: (string) => void,
+	init: (string) => Context,
 	start: (string) => Promise<string>,
-	bootstrap: (string) => Promise<string>
+	bootstrap: (string) => Promise<Context>
 };
 
 /**

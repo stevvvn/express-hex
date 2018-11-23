@@ -45,6 +45,7 @@ const path = require('path');
 			}
 		}
 		await impl.commit();
-		impl.close();
+		await impl.close();
+		process.exit();
 	}
 })();
