@@ -13,7 +13,7 @@ module.exports = ({ app, conf }: Context) => {
 			req.rawBody = buf;
    	}
 	})
-		.augment(conf.get('body-parser', {}))
+		.augment(conf.get('bodyParser', {}))
 		.get();
 
 	app.use(bodyParser.json(settings));
