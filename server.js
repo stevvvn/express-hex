@@ -9,6 +9,7 @@ const fs = require('fs');
 const middleware: any = require('./lib/middleware');
 const logger = require('./lib/log');
 const config = require('./lib/conf');
+const migrate = require('./lib/migrate');
 
 process.on('unhandledRejection', up => { throw up })
 
@@ -62,7 +63,7 @@ module.exports = (() => {
 		},
 		'start': (launchPath) => {
 			return rv.bootstrap(launchPath).then((): Promise<string> => {
-				return new Promise((resolve, reject) => {
+				return new Promise(async (resolve, reject) => {
 					if (!rv.conf) {
 						return reject('initialization failed');
 					}
@@ -83,6 +84,10 @@ module.exports = (() => {
 						return reject('initialization failed');
 					}
 					rv.log.info('relevant paths', paths);
+
+					if (rv.conf.get('autoMigrate', false)) {
+						await migrate(rv.conf);
+					}
 					const args = port.slice(0);
 					args.push((err) => {
 						if (err) {
