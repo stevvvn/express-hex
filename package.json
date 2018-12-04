@@ -1,6 +1,6 @@
 {
   "name": "express-hex",
-  "version": "1.4.4",
+  "version": "1.4.5",
   "description": "Cooperative Express middleware",
   "directories": {
     "test": "test"
