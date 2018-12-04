@@ -6,8 +6,10 @@ const migrate = require(`${ __dirname }/../lib/migrate`);
 if (require.main === module) {
 	(async () => {
 		const { conf } = await bootstrap(process.argv[2] ? process.argv[2] : process.cwd());
-		const impl = await migrate(conf);
-		await impl.close();
+		const impls = await migrate(conf);
+		for (const impl of impls) {
+			await impl.close();
+		}
 		process.exit();
 	})();
 }
