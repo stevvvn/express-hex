@@ -85,7 +85,7 @@ module.exports = (() => {
 					}
 					rv.log.info('relevant paths', paths);
 
-					if (rv.conf.get('autoMigrate', false)) {
+					if (rv.conf && rv.conf.get('autoMigrate', false)) {
 						await migrate(rv.conf);
 					}
 					const args = port.slice(0);
