@@ -75,6 +75,13 @@ module.exports = (() => {
 					if (port === null) {
 						return reject('initialization failed');
 					}
+
+					let deferred = Promise.resolve();
+					rv.app.locals.initDeferred.forEach((cb) =>
+						deferred = deferred.then(cb)
+					);
+					await deferred;
+
 					const isSocket = /\//.test(port[0]);
 
 					if (isSocket && fs.existsSync(port[0])) {
