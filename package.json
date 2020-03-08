@@ -1,26 +1,34 @@
 {
-  "name": "express-hex",
-  "version": "1.5.1",
-  "description": "Cooperative Express middleware",
-  "directories": {
-    "test": "test"
+  "_from": "express-hex",
+  "_id": "express-hex@1.5.0",
+  "_inBundle": false,
+  "_integrity": "sha512-wwkGK6LGQDG7CCRrkXt6KWtplqZwH7Nl4TA37ptOqHfAp+ubUuVjOsYglNfmHcyJ9QLDszhIrJuo1hrjpxhrvg==",
+  "_location": "/express-hex",
+  "_phantomChildren": {},
+  "_requested": {
+    "type": "tag",
+    "registry": true,
+    "raw": "express-hex",
+    "name": "express-hex",
+    "escapedName": "express-hex",
+    "rawSpec": "",
+    "saveSpec": null,
+    "fetchSpec": "latest"
   },
+  "_requiredBy": [
+    "#USER",
+    "/"
+  ],
+  "_resolved": "https://registry.npmjs.org/express-hex/-/express-hex-1.5.0.tgz",
+  "_shasum": "2dd9062b534d464873af90720b41a0f5ff791890",
+  "_spec": "express-hex",
+  "_where": "/home/git/scratch/packages/server",
+  "author": "",
   "bin": {
     "hex-conf": "bin/conf",
     "hex-migrate": "bin/migrate"
   },
-  "scripts": {
-    "test": "jest"
-  },
-  "jest": {
-    "testEnvironment": "node",
-    "verbose": true,
-    "transform": {
-      "\\.js$": "./dev/jest-transform.js"
-    }
-  },
-  "author": "",
-  "license": "MIT",
+  "bundleDependencies": false,
   "dependencies": {
     "abstract-migrator": "^1.2.1",
     "body-parser": "^1.18.3",
@@ -28,12 +36,16 @@
     "express": "^4.16.2",
     "flow-remove-types": "^1.2.3",
     "helmet": "^3.15.0",
-    "hex-object": "^1.3.2",
+    "hex-object": "^1.3.0",
     "init-package-json": "^1.10.1",
     "json-stringify-safe": "^5.0.1",
     "minimist": "^1.2.0"
   },
+  "deprecated": false,
+  "description": "Cooperative Express middleware",
   "devDependencies": {
+    "@types/express": "~4.17.3",
+    "@types/node": "~13.9.0",
     "babel-jest": "^21.2.0",
     "babel-plugin-transform-flow-strip-types": "^6.22.0",
     "babel-preset-jest": "^21.2.0",
@@ -42,5 +54,22 @@
     "request": "^2.83.0",
     "request-promise": "^4.2.2",
     "rimraf": "^2.6.2"
-  }
+  },
+  "directories": {
+    "test": "test"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "verbose": true,
+    "transform": {
+      "\\.js$": "./dev/jest-transform.js"
+    }
+  },
+  "license": "MIT",
+  "name": "express-hex",
+  "scripts": {
+    "start": "node server.js",
+    "test": "jest"
+  },
+  "version": "1.5.0"
 }
